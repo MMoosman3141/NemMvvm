@@ -3,17 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Windows.Controls;
 
 namespace NemMvvm {
 	/// <summary>
-	/// This class provides functionality for INotifyPropertyChanged in order to allow easy binding of UI control properties to backend code.
-	/// 
-	/// Objects which inherit from this class should set properties using a call to SetProperty, when within the Set functionality of a Property definition.
-	/// Doing so will update the underlying field, and appropriately raise the PropertyChanged event.
-	/// 
-	/// A call to RaisePropertyCahnged should be made to provide change notification for binding, when a property is set outside of it's Property definition.
+	/// This object represents a UserControl object in which Property change notifications can be easily handled.
 	/// </summary>
-	public class NotifyPropertyChanged : INotifyPropertyChanged	{
+	public class MvvmUserControl : UserControl, INotifyPropertyChanged {
 		private object _propertyLock = new object();
 
 		/// <summary>
@@ -86,9 +82,9 @@ namespace NemMvvm {
 				propertyName = ((MemberExpression)property.Body).Member.Name;
 			else
 				propertyName = ((MemberExpression)((UnaryExpression)property.Body).Operand).Member.Name;
-			
+
 			return SetProperty(ref field, value, commands, propertyName);
-		}		
+		}
 
 		/// <summary>
 		/// Raises the PropertyChanged event for the named property.  If no parameter is passed, the name of the calling property is used.
