@@ -9,7 +9,7 @@ namespace NemMvvm {
 	/// <summary>
 	/// This object represents a Window object in which Property change notifications can be easily handled.
 	/// </summary>
-	public class MvvmWindow : Window, INotifyPropertyChanged {
+	internal class MvvmWindow : Window, INotifyPropertyChanged {
 		private object _propertyLock = new object();
 
 		/// <summary>

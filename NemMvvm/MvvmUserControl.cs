@@ -9,7 +9,7 @@ namespace NemMvvm {
 	/// <summary>
 	/// This object represents a UserControl object in which Property change notifications can be easily handled.
 	/// </summary>
-	public class MvvmUserControl : UserControl, INotifyPropertyChanged {
+	internal class MvvmUserControl : UserControl, INotifyPropertyChanged {
 		private object _propertyLock = new object();
 
 		/// <summary>
