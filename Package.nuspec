@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>NemSoftware.NemMvvm</id>
+    <version>1.0.0</version>
+    <authors>Mark Moosman, Michael Moosman</authors>
+    <owners>Mark Moosman, Michael Moosman</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/MMoosman3141/NemMvvm</projectUrl>    
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <description>Library to make working with Mvvm patterns in .Net simpler.</description>
+    <releaseNotes></releaseNotes>
+    <copyright>Copyright 2016 Mark Moosman</copyright>
+    <tags>Mvvm C#</tags>
+    <dependencies>
+      <dependency id="SampleDependency" version="1.0" />
+    </dependencies>
+  </metadata>
+  <files>
+	<file src="C:\Users\Mark.ZEPHYR\Documents\Visual Studio 2015\Projects\NemMvvm\NemMvvm\bin\x64\Release\NemMvvm.dll" target="lib\NemMvvm.dll" />
+	<file src="C:\Users\Mark.ZEPHYR\Documents\Visual Studio 2015\Projects\NemMvvm\NemMvvm\bin\x64\Release\Licenses" target="content\" />
+  </files>
+</package>
