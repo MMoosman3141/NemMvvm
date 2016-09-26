@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>Mark Moosman</authors>
+    <owners>Mark Moosman</owners>
+    <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
+    <projectUrl>https://github.com/MMoosman3141/NemMvvm</projectUrl>    
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>.Net Library to make working with Mvvm Patterns easier.</description>
+	<releaseNotes>Initial version. Contains NotifyPropertyChanged, Command, MvvmUserControl, and MvvmWindow</releaseNotes>
+    <copyright>Copyright 2016 $author$</copyright>
+    <tags>Mvvm C#</tags>
+  </metadata>  
+  <files>
+	<file src="bin\x64\Release\NemMvvm.dll" target="lib\net461\" />
+	<file src="Licenses\NemMvvm_License.txt" target="content\Licenses\NemMvvm_License.txt" />
+  </files>
+</package>
