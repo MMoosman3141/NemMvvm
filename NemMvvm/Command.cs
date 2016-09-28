@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace NemMvvm {
+	/// <summary>
+	/// The Command class is a generic implementation of ICommand, allowing the specification of and Action to be executed, and a function to check if the action can be executed.
+	/// </summary>
 	public class Command : ICommand {
 		private Action _execute;
 		private Func<bool> _canExecute;
