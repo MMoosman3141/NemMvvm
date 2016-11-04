@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("NemMvvm")]
-[assembly: AssemblyDescription(".Net Library to make working with Mvvm Patterns easier.")]
+[assembly: AssemblyTitle("UnitTestNemMvvm")]
+[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Mark Moosman")]
-[assembly: AssemblyProduct("NemMvvm")]
-[assembly: AssemblyCopyright("Copyright ©  2016 Mark Moosman")]
+[assembly: AssemblyCompany("")]
+[assembly: AssemblyProduct("UnitTestNemMvvm")]
+[assembly: AssemblyCopyright("Copyright ©  2016")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ffb954b8-61ca-4ff2-b1e2-4ea2cfb2019c")]
+[assembly: Guid("d72a1cf8-6438-45c9-8616-ee5df5a0cc0d")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -31,6 +31,6 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("1.1.1.*")]
-[assembly: AssemblyInformationalVersion("1.1.1-beta")]
-//[assembly: AssemblyVersion("1.1.*")]
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]
