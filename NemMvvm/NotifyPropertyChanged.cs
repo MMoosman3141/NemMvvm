@@ -16,6 +16,35 @@ namespace NemMvvm {
 	public class NotifyPropertyChanged : INotifyPropertyChanged	{
 		private object _propertyLock = new object();
 
+		protected object NotifyPropertyChangedLock {
+			get {
+				return _propertyLock;
+			}
+			set {
+				_propertyLock = value;
+			}
+		}
+
+		private bool SetValue<T>(ref T field, T value) {
+			/*
+											field == null       newValue == null           ^        field != null && field != newValue     ||
+			 execute             true                  false             true                   false                      true
+			 execute             false                 true              true                   false                      true
+			 execute             false                 false             false                  true                       true
+			 don't execute       true                  true              false                  false                      false
+			 don't execute       false                 false             false                  false                      false
+			*/
+
+			bool propertyChanged = false;
+
+			if ((field == null ^ value == null) || (field != null && !field.Equals(value))) {
+				field = value;
+				propertyChanged = true;
+			}
+
+			return propertyChanged;
+		}
+
 		/// <summary>
 		/// Sets the value of a property, and raises the PropertyChanged event for the property.
 		/// The PropertyChanged event is only called in the case that the value of the referenced field changed as determined by the Equals method of the object.
@@ -32,18 +61,42 @@ namespace NemMvvm {
 			bool propertyChanged = false;
 
 			lock (_propertyLock) {
-				/*
-				                field == null       newValue == null           ^        field != null && field != newValue     ||
-				 execute             true                  false             true                   false                      true
-				 execute             false                 true              true                   false                      true
-				 execute             false                 false             false                  true                       true
-				 don't execute       true                  true              false                  false                      false
-				 don't execute       false                 false             false                  false                      false
-				*/
-				if ((field == null ^ value == null) || (field != null && !field.Equals(value))) {
-					field = value;
+				propertyChanged = SetValue(ref field, value);
+
+				if (propertyChanged) {
 					RaisePropertyChanged(propertyName);
-					propertyChanged = true;
+				}
+			}
+			return propertyChanged;
+		}
+
+		/// <summary>
+		/// Sets the value of a property, and raises the PropertyChanged event for the property when the value changes.
+		/// This method also runs an action if the result of the changing of the property matches the runActionCheck.  If runActionCheck is null (the default) the action is always run.
+		/// The PropertyChanged event is only called in the case that the value of the referenced field changed as determined by the Equals method of the object.
+		/// </summary>
+		/// <typeparam name="T">The Type of the property being set.</typeparam>
+		/// <param name="field">A reference to the field which is to be affected.</param>
+		/// <param name="value">The value to which the field is to be set.</param>
+		/// <param name="action">The action to run if the result of setting the field matches the runActionCheck parameter.</param>
+		/// <param name="runActionCheck">A bool? value.  If true, and the field is successfully set the action will run.  If false and the field is not set the action will run.  If null (the default) the action will always run. </param>
+		/// <param name="propertyName">The name of the property being set.  If not specified, the parameter defaults to the name of the calling property.</param>
+		/// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
+		protected bool SetProperty<T>(ref T field, T value, Action action, bool? runActionCheck = null, [CallerMemberName] string propertyName = "") {
+			if (string.IsNullOrWhiteSpace(propertyName))
+				throw new ArgumentNullException("propertyName cannot be empty or null");
+
+			bool propertyChanged = false;
+
+			lock (_propertyLock) {
+				propertyChanged = SetValue(ref field, value);
+
+				if (runActionCheck == null || propertyChanged == runActionCheck) {
+					action();
+				}
+
+				if (propertyChanged) {
+					RaisePropertyChanged(propertyName);
 				}
 			}
 			return propertyChanged;
