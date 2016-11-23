@@ -16,6 +16,11 @@ namespace NemMvvm {
 	public class NotifyPropertyChanged : INotifyPropertyChanged	{
 		private object _propertyLock = new object();
 
+		/// <summary>
+		/// The lock object used by the SetProperty methods to ensure thread safety.
+		/// This object is exposed to allow external code to be locked to ensure no problems with race conditions when adjusting a value which may also be adjusted via a SetProperty call.
+		/// The use of this object is not recommended under normal circumstances.
+		/// </summary>
 		protected object NotifyPropertyChangedLock {
 			get {
 				return _propertyLock;
@@ -115,6 +120,29 @@ namespace NemMvvm {
 		/// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
 		protected bool SetProperty<T>(ref T field, T value, IEnumerable<Command> commands, [CallerMemberName] string propertyName = "") {
 			bool retVal = SetProperty(ref field, value, propertyName);
+
+			foreach (Command cmd in commands)
+				cmd?.RaiseCanExecuteChanged();
+
+			return retVal;
+		}
+
+		/// <summary>
+		/// Sets the value of a property, and raises the PropertyChanged event for the property when the value changes.
+		/// This method also runs an action if the result of the changed of the property matches the runActionCheck parameter.  If runActionCheck is null (the default) the action is always run.
+		/// Also, an IEnumerable of Command objects have a RaiseCanExecuteChanged event raised, allowing the SetPropertyCommand to be used in conjunction with any number of Command objects.
+		/// The PropertyChanged event is only called in the case that the value of the referenced field changed, as determined by the Equals method of the object.
+		/// </summary>
+		/// <typeparam name="T">The Type of the property being set.</typeparam>
+		/// <param name="field">A reference to the field which is to be affected.</param>
+		/// <param name="value">The value to which the field is to be set.</param>
+		/// <param name="commands">An IEnumerable of Command objects for which to raise a RaiseCanExecuteChanged event.</param>
+		/// <param name="action">The action to run if the result of setting the field matches the runActionCheck parameter.</param>
+		/// <param name="runActionCheck">A bool? value.  If true, and the field is successfully set the action will run.  If false and the field is not set the action will run.  If null (the default) the action will always run.</param>
+		/// <param name="propertyName">The name of the property being set.  If not specified, the parameter defaults to the name of the calling property.</param>
+		/// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
+		protected bool SetProperty<T>(ref T field, T value, IEnumerable<Command> commands, Action action, bool? runActionCheck = null, [CallerMemberName] string propertyName = "") {
+			bool retVal = SetProperty(ref field, value, action, runActionCheck, propertyName);
 
 			foreach (Command cmd in commands)
 				cmd?.RaiseCanExecuteChanged();
