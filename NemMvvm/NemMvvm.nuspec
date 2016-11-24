@@ -8,7 +8,7 @@
     <owners>$author$</owners>
     <licenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</licenseUrl>
     <projectUrl>https://github.com/MMoosman3141/NemMvvm</projectUrl>    
-	<iconUrl>https://avatars1.githubusercontent.com/u/17674356?v=3&s=40</iconUrl>
+	<iconUrl>https://github.com/MMoosman3141/NemMvvm/blob/master/NemMvvm/NemAnkh.ico</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>.Net Library to make working with Mvvm Patterns easier.</description>
 	<releaseNotes>Update includes new verion of the SetProperty function that accepts an action to run when setting the property.</releaseNotes>
