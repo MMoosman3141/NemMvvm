@@ -60,6 +60,9 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>NemMvvm.pfx</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>NemAnkh.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -84,6 +87,7 @@
     <Content Include="Licenses\NemMvvm_License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="NemAnkh.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
@@ -91,10 +95,10 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>IF "$(ConfigurationName)" == "Release" (
-  nuget pack "$(ProjectPath)" -Prop Configuration=$(ConfigurationName)  
-)
-</PostBuildEvent>
+    <PostBuildEvent>IF "$(ConfigurationName)"=="Release" (
+  del "$(TargetDir)*.nupkg"
+  nuget pack "$(ProjectPath)" -Prop Configuration=$(ConfigurationName);Platform=$(PlatformName)
+)</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
