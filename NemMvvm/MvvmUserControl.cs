@@ -10,7 +10,7 @@ namespace NemMvvm {
   /// This object represents a UserControl object in which Property change notifications can be easily handled.
   /// </summary>
   internal class MvvmUserControl : UserControl, INotifyPropertyChanged {
-    private object _propertyLock = new object();
+    private readonly object _propertyLock = new object();
 
     /// <summary>
     /// Sets the value of a property, and raises the PropertyChanged event for the property.
@@ -57,10 +57,10 @@ namespace NemMvvm {
     /// <param name="commands">An IEnumerable of Command objects for which to raise a RaiseCanExecuteChanged event.</param>
     /// <param name="propertyName">The name of the property being set.  If not specified, the parameter defaults to the name of the calling property.</param>
     /// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
-    protected bool SetProperty<T>(ref T field, T value, IEnumerable<Command> commands, [CallerMemberName] string propertyName = "") {
+    protected bool SetProperty<T>(ref T field, T value, IEnumerable<IFoundationCommand> commands, [CallerMemberName] string propertyName = "") {
       bool retVal = SetProperty(ref field, value, propertyName);
 
-      foreach(Command cmd in commands) {
+      foreach(IFoundationCommand cmd in commands) {
         cmd?.RaiseCanExecuteChanged();
       }
 
@@ -78,7 +78,7 @@ namespace NemMvvm {
     /// <param name="property">A lambda expression representing the Property to be set.</param>
     /// <param name="commands">An array, or comma delimited list of Command objects for which to raise a RaiseCanExecuteChanged event.</param>
     /// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
-    protected bool SetProperty<T>(ref T field, T value, Expression<Func<object>> property, params Command[] commands) {
+    protected bool SetProperty<T>(ref T field, T value, Expression<Func<object>> property, params IFoundationCommand[] commands) {
       string propertyName;
       if(property.Body is MemberExpression) {
         propertyName = ((MemberExpression)property.Body).Member.Name;
