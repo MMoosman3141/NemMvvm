@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Mark Moosman")]
 [assembly: AssemblyProduct("NemMvvm")]
-[assembly: AssemblyCopyright("Copyright ©  2016 Mark Moosman")]
+[assembly: AssemblyCopyright("Copyright © 2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
