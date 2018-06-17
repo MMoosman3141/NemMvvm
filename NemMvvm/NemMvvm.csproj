@@ -77,20 +77,22 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BaseCommand.cs" />
     <Compile Include="Command.cs" />
+    <Compile Include="INemCommand.cs" />
+    <Compile Include="TypedActionCommand.cs" />
+    <Compile Include="TypedCommand.cs" />
     <Compile Include="MvvmUserControl.cs" />
     <Compile Include="MvvmWindow.cs" />
     <Compile Include="NotifyPropertyChanged.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Licenses\NemMvvm_License.txt">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
     <Content Include="NemAnkh.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
+    <None Include="NemMvvm.nuspec" />
     <None Include="NemMvvm.pfx" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
