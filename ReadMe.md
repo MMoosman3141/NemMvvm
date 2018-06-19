@@ -17,30 +17,44 @@ There are basically 2 methods available from this class:
 For example:
 ```csharp
 public class Person : NotifyPropertyChanged {
-   private string _firstName;
-   private string _middleName;
-   private string _lastName;
-   private uint _age;
+  private string _firstName;
+  private string _middleName;
+  private string _lastName;
+  private uint _age;
 
-   public string FirstName {
-     get => _firstName;
-     set => SetProperty(ref _firstName, value);
-   }
+  private bool _middleSet = false;
+  private bool _lastChanged = false;
+  private bool _ageNotChanged = false;
 
-   public string MiddleName {
-     get => _middleName;
-     set => SetProperty(ref _middleName, value);
-   }
+  public string FirstName {
+    get => _firstName;
+    set => SetProperty(ref _firstName, value);
+  }
 
-   public string LastName {
-     get => _lastName;
-     set => SetProperty(ref _lastName, value);
-   }
+  //It is also possible to run code depending on the out come of the SetProperty
+  public string MiddleName {
+    get => _middleName;
+    //Runs the action regardless of if the SetProperty actually makes a change or not.
+    set => SetProperty(ref _middleName, value, () => {
+      _middleSet = true;
+    });
+  }
 
-   public uint Age {
-     get => _age;
-     set  SetProperty(ref _age, value);
-   }
+  public string LastName {
+    get => _lastName;
+    //Action only runs if _lastName is actually changed.  If it is not changed the action is not run.
+    set => SetProperty(ref _lastName, value, () => {
+      _lastChanged = true;_
+    }, true);
+  }
+
+  public uint Age {
+    get => _age;
+    //Action only runs if _age is not changed,  If it is changed the action is not run.
+    set => SetProperty(ref _age, value, () => {
+      _ageNotChanged = true;
+    }, false);
+  }
 }
 ```
 ### Command object
@@ -50,21 +64,47 @@ The Command object is a generic implementation of ICommand allowing you to speci
 For example:
 ```csharp
 public class CommandExecution : NotifyPropertyChanged {
-  private Command _browseCommand;
+  private Command _browseCmd;
+  private Command<string> _setTextCmd;
+  private Command<string, int> _setTextIfValidCmd;
   private bool _allowBrowse = false;
+  private string _text;
+  private string _validNum;
 
-  public Command BrowseCommand {
-    get => _browseCommand;
-    set => SetProperty(ref _browseCommand, value);
+  public Command BrowseCmd {
+    get => _browseCmd;
+    set => SetProperty(ref _browseCmd, value);
+  }
+
+  public Command<string> SetTextCmd {
+    get => _setTextCmd;
+    set => SetProperty(ref _setTextCmd, value);
+  }
+
+  public Command<string, int> SetTextIfValidCmd {
+    get => _setTextIfValidCmd;
+    set => SetProperty(ref _setTextIfValidCmd, value);
   }
 
   public bool AllowBrowse {
     get => _allowBrowse;
-    set => SetProperty(ref _allowBrowse, value, BrowseCommand);
+    set => SetProperty(ref _allowBrowse, value, BrowseCmd);
+  }
+
+  public string Text {
+    get => _text;
+    set => SetProperty(ref _text, value);
+  }
+
+  public string ValidNum {
+    get => _validNum;
+    set => SetProperty(ref _validNum, value, SetTextIfValidCmd);
   }
 
   public CommandExecution() {
-    BrowseCommand = new Command(BrowseForFile, CanBrowseForFile);
+    BrowseCmd = new Command(BrowseForFile, CanBrowseForFile);
+    SetTextCmd = new Command<string>(SetText);
+    SetTextIfValidCmd = new Command<string, int>(SetText, CanSetText);
   }
 
   public void BrowseForFile() {
@@ -78,5 +118,14 @@ public class CommandExecution : NotifyPropertyChanged {
   public bool CanBrowseForFile() {
     return AllowBrowse;
   }
+
+  public void SetText(string text) {
+    Text = text;
+  }
+
+  public bool CanSetText(int num) {
+    return num >= ValidNum;
+  }
+
 }
 ```
