@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
@@ -14,19 +15,14 @@ namespace NemMvvm {
   /// A call to RaisePropertyCahnged should be made to provide change notification for binding, when a property is set outside of it's Property definition.
   /// </summary>
   public class NotifyPropertyChanged : INotifyPropertyChanged {
-    private object _propertyLock = new object();
-
     /// <summary>
     /// The lock object used by the SetProperty methods to ensure thread safety.
     /// This object is exposed to allow external code to be locked to ensure no problems with race conditions when adjusting a value which may also be adjusted via a SetProperty call.
     /// The use of this object is not recommended under normal circumstances.
     /// </summary>
-    protected object NotifyPropertyChangedLock {
-      get => _propertyLock;
-      set => _propertyLock = value;
-    }
+    protected object NotifyPropertyChangedLock { get; } = new object();
 
-    private bool SetValue<T>(ref T field, T value) {
+    private static bool SetValue<T>(ref T field, T value) {
       /*
                       field == null       newValue == null           ^        field != null && field != newValue     ||
        execute             true                  false             true                   false                      true
@@ -57,12 +53,12 @@ namespace NemMvvm {
     /// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
     protected bool SetProperty<T>(ref T field, T value, [CallerMemberName] string propertyName = "") {
       if(string.IsNullOrWhiteSpace(propertyName)) {
-        throw new ArgumentNullException("propertyName cannot be empty or null");
+        throw new ArgumentNullException(nameof(propertyName), $"{nameof(propertyName)} cannot be empty or null");
       }
 
       bool propertyChanged = false;
 
-      lock(_propertyLock) {
+      lock(NotifyPropertyChangedLock) {
         propertyChanged = SetValue(ref field, value);
 
         if(propertyChanged) {
@@ -86,12 +82,12 @@ namespace NemMvvm {
     /// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
     protected bool SetProperty<T>(ref T field, T value, Action action, bool? runActionCheck = null, [CallerMemberName] string propertyName = "") {
       if(string.IsNullOrWhiteSpace(propertyName)) {
-        throw new ArgumentNullException("propertyName cannot be empty or null");
+        throw new ArgumentNullException(nameof(propertyName), $"{nameof(propertyName)} cannot be empty or null");
       }
 
       bool propertyChanged = false;
 
-      lock(_propertyLock) {
+      lock(NotifyPropertyChangedLock) {
         propertyChanged = SetValue(ref field, value);
 
         if(runActionCheck == null || propertyChanged == runActionCheck) {
@@ -119,8 +115,10 @@ namespace NemMvvm {
     protected bool SetProperty<T>(ref T field, T value, IEnumerable<IFoundationCommand> commands, [CallerMemberName] string propertyName = "") {
       bool retVal = SetProperty(ref field, value, propertyName);
 
-      foreach(IFoundationCommand cmd in commands) {
-        cmd?.RaiseCanExecuteChanged();
+      if((commands?.Count() ?? 0) > 0) {
+        foreach(IFoundationCommand cmd in commands) {
+          cmd?.RaiseCanExecuteChanged();
+        }
       }
 
       return retVal;
@@ -143,8 +141,10 @@ namespace NemMvvm {
     protected bool SetProperty<T>(ref T field, T value, IEnumerable<IFoundationCommand> commands, Action action, bool? runActionCheck = null, [CallerMemberName] string propertyName = "") {
       bool retVal = SetProperty(ref field, value, action, runActionCheck, propertyName);
 
-      foreach(IFoundationCommand cmd in commands) {
-        cmd?.RaiseCanExecuteChanged();
+      if((commands?.Count() ?? 0) > 0) {
+        foreach(IFoundationCommand cmd in commands) {
+          cmd?.RaiseCanExecuteChanged();
+        }
       }
 
       return retVal;
@@ -161,7 +161,11 @@ namespace NemMvvm {
     /// <param name="property">A lambda expression representing the Property to be set.</param>
     /// <param name="commands">An array, or comma delimited list of Command objects for which to raise a RaiseCanExecuteChanged event.</param>
     /// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
-    protected bool SetProperty<T>(ref T field, T value, Expression<Func<object>> property, params IFoundationCommand[] commands) {
+    protected bool SetProperty<T>(ref T field, T value, LambdaExpression property, params IFoundationCommand[] commands) {
+      if(property == null) {
+        throw new ArgumentNullException(nameof(property), $"{nameof(property)} cannot be null");
+      }
+
       string propertyName;
       if(property.Body is MemberExpression) {
         propertyName = ((MemberExpression)property.Body).Member.Name;
@@ -178,7 +182,7 @@ namespace NemMvvm {
     /// <param name="propertyName">The name of the property for which the PropertyChanged event should be called.  If not property name is passed, the name of the calling property is used.</param>
     protected void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
       if(string.IsNullOrWhiteSpace(propertyName)) {
-        throw new ArgumentNullException("propertyName cannot be empty or null");
+        throw new ArgumentNullException(nameof(propertyName), $"{nameof(propertyName)} cannot be empty or null");
       }
 
       PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -189,7 +193,11 @@ namespace NemMvvm {
     /// Raises the PropertyChanged event for the property passed as a lambda expression.
     /// </summary>
     /// <param name="property">A property function passes as a lambda expression.</param>
-    protected void RaisePropertyChanged(Expression<Func<object>> property) {
+    protected void RaisePropertyChanged(LambdaExpression property) {
+      if(property == null) {
+        throw new ArgumentNullException(nameof(property), $"{nameof(property)} cannot be null");
+      }
+
       string propertyName;
       if(property.Body is MemberExpression) {
         propertyName = ((MemberExpression)property.Body).Member.Name;
