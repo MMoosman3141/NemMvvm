@@ -4,14 +4,14 @@ namespace NemMvvm {
   /// <summary>
   /// Abstract class used as a base for typed and untyped Command objects.
   /// </summary>
-  /// <typeparam name="T">The type of parameter used in the Action for Execute</typeparam>
-  /// <typeparam name="R">The type of parameter used in the Func for CanExecute</typeparam>
-  public abstract class BaseCommand<T, R> : IFoundationCommand {
+  /// <typeparam name="T1">The type of parameter used in the Action for Execute</typeparam>
+  /// <typeparam name="T2">The type of parameter used in the Func for CanExecute</typeparam>
+  public abstract class BaseCommand<T1, T2> : IFoundationCommand {
 #pragma warning disable CS1591
-    protected readonly Action _execute;
-    protected readonly Func<bool> _canExecute;
-    protected readonly Action<T> _executeWithParam;
-    protected readonly Func<R, bool> _canExecuteWithParam;
+    protected Action ExecuteAction { get; private set; }
+    protected Func<bool> CanExecuteFunc { get; private set; }
+    protected Action<T1> ExecuteWithParamAction { get; private set; }
+    protected Func<T2, bool> CanExecuteWithParamFunc { get; private set; }
 #pragma warning restore CS1591
 
     /// <summary>
@@ -21,7 +21,7 @@ namespace NemMvvm {
     /// <param name="canExecute">The func to run for Commands without parameters.  This should never be set when canExecuteWithParam is set</param>
     /// <param name="executeWithParam">The action to run for Commands with parameters.  This should never be set when execute is set.</param>
     /// <param name="canExecuteWithParam">The func to run for Commands with parameters.  This should never be set when canExecute is set.</param>
-    public BaseCommand(Action execute = null, Func<bool> canExecute = null, Action<T> executeWithParam = null, Func<R, bool> canExecuteWithParam = null) {
+    protected BaseCommand(Action execute, Func<bool> canExecute, Action<T1> executeWithParam, Func<T2, bool> canExecuteWithParam) {
       if(execute == null && executeWithParam == null) {
         throw new ArgumentNullException(nameof(execute), "No Execute action specified.");
       }
@@ -32,10 +32,10 @@ namespace NemMvvm {
         throw new ArgumentException("Cannot specify both an canExecute action and a canExecuteWithParam action.", nameof(canExecute));
       }
 
-      _execute = execute;
-      _canExecute = canExecute;
-      _executeWithParam = executeWithParam;
-      _canExecuteWithParam = canExecuteWithParam;
+      ExecuteAction = execute;
+      CanExecuteFunc = canExecute;
+      ExecuteWithParamAction = executeWithParam;
+      CanExecuteWithParamFunc = canExecuteWithParam;
     }
 
     /// <summary>
@@ -46,20 +46,20 @@ namespace NemMvvm {
     [Obsolete("This method should not be run directly.  If running with no parameters, call Execute(), if running with parameters call Execute with the properly typed parameter.")]
     public void Execute(object parameter) {
       if(parameter == null) {
-        _execute?.Invoke();
+        ExecuteAction?.Invoke();
       } else {
-        if(parameter.GetType() != typeof(T)) {
-          throw new ArgumentException($"parameter must be of type {typeof(T).Name}");
+        if(parameter.GetType() != typeof(T1)) {
+          throw new ArgumentException($"parameter must be of type {typeof(T1).Name}");
         }
 
-        T param;
+        T1 param;
         try {
-          param = (T)parameter;
+          param = (T1)parameter;
         } catch(InvalidCastException) {
           throw;
         }
 
-        _executeWithParam?.Invoke(param);
+        ExecuteWithParamAction?.Invoke(param);
       }
     }
 
@@ -72,20 +72,20 @@ namespace NemMvvm {
     [Obsolete("This method should not be run directly.  If running with no parameters, call CanExecute(), if running with parameters call CanExecute with the properly typed parameter.")]
     public bool CanExecute(object parameter) {
       if(parameter == null) {
-        return _canExecute?.Invoke() ?? true;
+        return CanExecuteFunc?.Invoke() ?? true;
       } else {
-        if(parameter.GetType() != typeof(R)) {
-          throw new ArgumentException($"parameter must be of type {typeof(T).Name}");
+        if(parameter.GetType() != typeof(T2)) {
+          throw new ArgumentException($"parameter must be of type {typeof(T1).Name}");
         }
 
-        R param;
+        T2 param;
         try {
-          param = (R)parameter;
+          param = (T2)parameter;
         } catch(InvalidCastException) {
           throw;
         }
 
-        return _canExecuteWithParam?.Invoke(param) ?? true;
+        return CanExecuteWithParamFunc?.Invoke(param) ?? true;
       }
     }
 
