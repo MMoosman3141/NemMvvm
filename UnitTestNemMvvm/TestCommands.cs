@@ -5,7 +5,7 @@ using NemMvvm;
 
 namespace UnitTestNemMvvm {
   [TestClass]
-  public class UnitTest1 : NotifyPropertyChanged {
+  public class TestCommands : NotifyPropertyChanged {
     private string _testValue1 = "oldValue";
     private string _testValue2 = "oldValue";
     private string _testValue3 = "oldValue";
@@ -66,88 +66,7 @@ namespace UnitTestNemMvvm {
       }
     }
 
-    [TestMethod]
-    public void SetPropertyTest() {
-      bool propertyChanged = false;
-      this.PropertyChanged += (s, e) => {
-        if(e.PropertyName == nameof(TestValue1))
-          propertyChanged = true;
-      };
 
-      TestValue1 = "newValue";
-
-      Assert.AreEqual("newValue", TestValue1);
-      Assert.IsTrue(propertyChanged);
-    }
-
-    [TestMethod]
-    public void SetPropertyActionTest() {
-      bool propertyChanged = false;
-      this.PropertyChanged += (s, e) => {
-        if(e.PropertyName == nameof(TestValue2))
-          propertyChanged = true;
-      };
-
-      _actionCondition = null;
-
-      TestValue2 = "newValue";
-
-      Assert.AreEqual("newValue", TestValue2);
-      Assert.AreEqual("actionComplete", _testValue3);
-      Assert.IsTrue(propertyChanged);
-    }
-
-    [TestMethod]
-    public void SetPropertyActionTestOnTrue() {
-      bool propertyChanged = false;
-      this.PropertyChanged += (s, e) => {
-        if(e.PropertyName == nameof(TestValue2))
-          propertyChanged = true;
-      };
-
-      _actionCondition = true;
-
-      TestValue2 = "newValue";
-
-      Assert.AreEqual("newValue", TestValue2);
-      Assert.AreEqual("actionComplete", _testValue3);
-      Assert.IsTrue(propertyChanged);
-    }
-
-    [TestMethod]
-    public void SetPropertyActionTestOnFalse() {
-      bool propertyChanged = false;
-      this.PropertyChanged += (s, e) => {
-        if(e.PropertyName == nameof(TestValue2))
-          propertyChanged = true;
-      };
-
-      _actionCondition = false;
-
-      _testValue2 = "newValue";
-      TestValue2 = "newValue";
-
-      Assert.AreEqual("newValue", TestValue2);
-      Assert.AreEqual("actionComplete", _testValue3);
-      Assert.IsFalse(propertyChanged);
-    }
-    [TestMethod]
-    public void SetPropertyActionTestNotCompleted() {
-      bool propertyChanged = false;
-      this.PropertyChanged += (s, e) => {
-        if(e.PropertyName == nameof(TestValue2))
-          propertyChanged = true;
-      };
-
-      _actionCondition = false;
-
-      _testValue2 = "oldValue";
-      TestValue2 = "newValue";
-
-      Assert.AreEqual("newValue", TestValue2);
-      Assert.AreEqual("notCompleted", _testValue3);
-      Assert.IsTrue(propertyChanged);
-    }
 
     [TestMethod]
     public void SetPropertyWithCommandObjectsAndActions() {

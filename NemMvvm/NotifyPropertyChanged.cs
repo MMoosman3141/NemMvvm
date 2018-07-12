@@ -23,23 +23,12 @@ namespace NemMvvm {
     protected object NotifyPropertyChangedLock { get; } = new object();
 
     private static bool SetValue<T>(ref T field, T value) {
-      /*
-                      field == null       newValue == null           ^        field != null && field != newValue     ||
-       execute             true                  false             true                   false                      true
-       execute             false                 true              true                   false                      true
-       execute             false                 false             false                  true                       true
-       don't execute       true                  true              false                  false                      false
-       don't execute       false                 false             false                  false                      false
-      */
-
-      bool propertyChanged = false;
-
-      if((field == null ^ value == null) || (field != null && !field.Equals(value))) {
-        field = value;
-        propertyChanged = true;
+      if(Equals(field, value)) {
+        return false;
       }
 
-      return propertyChanged;
+      field = value;
+      return true;
     }
 
     /// <summary>
@@ -161,7 +150,7 @@ namespace NemMvvm {
     /// <param name="property">A lambda expression representing the Property to be set.</param>
     /// <param name="commands">An array, or comma delimited list of Command objects for which to raise a RaiseCanExecuteChanged event.</param>
     /// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
-    protected bool SetProperty<T>(ref T field, T value, LambdaExpression property, params IFoundationCommand[] commands) {
+    protected bool SetProperty<T>(ref T field, T value, Expression<Func<T>> property, params IFoundationCommand[] commands) {
       if(property == null) {
         throw new ArgumentNullException(nameof(property), $"{nameof(property)} cannot be null");
       }
@@ -177,7 +166,28 @@ namespace NemMvvm {
     }
 
     /// <summary>
+    /// Sets the value of a property, and raises the PropertyChanges event for the property.
+    /// Also, an array of Command objects have a RaiseCanExecuteChanged event raised, allowing the SetPropertyCommand to be used in conjunction with any number of Command objects.
+    /// The PropertyChanged event is only called in the case that the value of the referenced field changed as determined by the Equals method of the object.
+    /// </summary>
+    /// <typeparam name="T">The Type of the property being set.</typeparam>
+    /// <param name="field">A reference to the field value wich is returned by the property</param>
+    /// <param name="value">The value to which the field is to be set</param>
+    /// <param name="property">The name of the Property to be set.  (This is easily obtained using the nameof method.</param>
+    /// <param name="commands">An array, or comma delimited list of Command objects for which to raise a RaiseCanExecuteChanged event.</param>
+    /// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
+    protected bool SetProperty<T>(ref T field, T value, string property, params IFoundationCommand[] commands) {
+      if(property == null) {
+        throw new ArgumentNullException(nameof(property), $"{nameof(property)} cannot be null");
+      }
+
+      return SetProperty(ref field, value, commands, property);
+    }
+
+    /// <summary>
     /// Raises the PropertyChanged event for the named property.  If no parameter is passed, the name of the calling property is used.
+    /// This method runs significantly faster than the version taking a lambda expression.
+    /// This can be coupled with the nameof method to avoid the use of string constants
     /// </summary>
     /// <param name="propertyName">The name of the property for which the PropertyChanged event should be called.  If not property name is passed, the name of the calling property is used.</param>
     protected void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
@@ -193,7 +203,7 @@ namespace NemMvvm {
     /// Raises the PropertyChanged event for the property passed as a lambda expression.
     /// </summary>
     /// <param name="property">A property function passes as a lambda expression.</param>
-    protected void RaisePropertyChanged(LambdaExpression property) {
+    protected void RaisePropertyChanged<T>(Expression<Func<T>> property) {
       if(property == null) {
         throw new ArgumentNullException(nameof(property), $"{nameof(property)} cannot be null");
       }

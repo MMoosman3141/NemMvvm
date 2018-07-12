@@ -88,7 +88,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="NemAnkh.ico" />
+    <EmbeddedResource Include="NemAnkh.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
