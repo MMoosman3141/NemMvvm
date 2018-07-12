@@ -144,16 +144,10 @@ namespace UnitTestNemMvvm {
         }
       };
 
-      this.PropertyChanged += TestNotifyPropertyChanged_PropertyChanged;
-
       Property1 = "newValue";
       RaisePropertyChanged(nameof(Property1));
 
       Assert.IsTrue(propChanged);
-    }
-
-    private void TestNotifyPropertyChanged_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
-      throw new NotImplementedException();
     }
   }
 }
