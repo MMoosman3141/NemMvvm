@@ -4,7 +4,7 @@ namespace NemMvvm {
   /// <summary>
   /// The Command class is a generic implementation of ICommand, allowing the specification of and Action to be executed, and a function to check if the action can be executed.
   /// </summary>
-  public sealed class Command : BaseCommand<object, object> {
+  public sealed class Command : BaseCommand<object> {
     /// <summary>
     /// Constructor of the Command object
     /// </summary>

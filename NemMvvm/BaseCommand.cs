@@ -4,14 +4,13 @@ namespace NemMvvm {
   /// <summary>
   /// Abstract class used as a base for typed and untyped Command objects.
   /// </summary>
-  /// <typeparam name="T1">The type of parameter used in the Action for Execute</typeparam>
-  /// <typeparam name="T2">The type of parameter used in the Func for CanExecute</typeparam>
-  public abstract class BaseCommand<T1, T2> : IFoundationCommand {
+  /// <typeparam name="T">The type of parameter used in the Action for Execute</typeparam>
+  public abstract class BaseCommand<T> : IFoundationCommand {
 #pragma warning disable CS1591
     protected Action ExecuteAction { get; private set; }
     protected Func<bool> CanExecuteFunc { get; private set; }
-    protected Action<T1> ExecuteWithParamAction { get; private set; }
-    protected Func<T2, bool> CanExecuteWithParamFunc { get; private set; }
+    protected Action<T> ExecuteWithParamAction { get; private set; }
+    protected Func<T, bool> CanExecuteWithParamFunc { get; private set; }
 #pragma warning restore CS1591
 
     /// <summary>
@@ -21,7 +20,7 @@ namespace NemMvvm {
     /// <param name="canExecute">The func to run for Commands without parameters.  This should never be set when canExecuteWithParam is set</param>
     /// <param name="executeWithParam">The action to run for Commands with parameters.  This should never be set when execute is set.</param>
     /// <param name="canExecuteWithParam">The func to run for Commands with parameters.  This should never be set when canExecute is set.</param>
-    protected BaseCommand(Action execute, Func<bool> canExecute, Action<T1> executeWithParam, Func<T2, bool> canExecuteWithParam) {
+    protected BaseCommand(Action execute, Func<bool> canExecute, Action<T> executeWithParam, Func<T, bool> canExecuteWithParam) {
       if(execute == null && executeWithParam == null) {
         throw new ArgumentNullException(nameof(execute), "No Execute action specified.");
       }
@@ -48,13 +47,13 @@ namespace NemMvvm {
       if(parameter == null) {
         ExecuteAction?.Invoke();
       } else {
-        if(parameter.GetType() != typeof(T1)) {
-          throw new ArgumentException($"parameter must be of type {typeof(T1).Name}");
+        if(parameter.GetType() != typeof(T)) {
+          throw new ArgumentException($"parameter must be of type {typeof(T).Name}");
         }
 
-        T1 param;
+        T param;
         try {
-          param = (T1)parameter;
+          param = (T)parameter;
         } catch(InvalidCastException) {
           throw;
         }
@@ -74,13 +73,13 @@ namespace NemMvvm {
       if(parameter == null) {
         return CanExecuteFunc?.Invoke() ?? true;
       } else {
-        if(parameter.GetType() != typeof(T2)) {
-          throw new ArgumentException($"parameter must be of type {typeof(T1).Name}");
+        if(parameter.GetType() != typeof(T)) {
+          throw new ArgumentException($"parameter must be of type {typeof(T).Name}");
         }
 
-        T2 param;
+        T param;
         try {
-          param = (T2)parameter;
+          param = (T)parameter;
         } catch(InvalidCastException) {
           throw;
         }

@@ -82,7 +82,6 @@
     <Compile Include="BaseCommand.cs" />
     <Compile Include="Command.cs" />
     <Compile Include="IFoundationCommand.cs" />
-    <Compile Include="TypedActionCommand.cs" />
     <Compile Include="TypedCommand.cs" />
     <Compile Include="NotifyPropertyChanged.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

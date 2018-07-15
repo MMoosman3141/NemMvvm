@@ -85,7 +85,7 @@ For example:
 public class CommandExecution : NotifyPropertyChanged {
   private Command _browseCmd;
   private Command<string> _setTextCmd;
-  private Command<string, int> _setTextIfValidCmd;
+  private Command<string> _setTextIfValidCmd;
   private bool _allowBrowse = false;
   private string _text;
   private string _validNum;
@@ -100,7 +100,7 @@ public class CommandExecution : NotifyPropertyChanged {
     set => SetProperty(ref _setTextCmd, value);
   }
 
-  public Command<string, int> SetTextIfValidCmd {
+  public Command<string> SetTextIfValidCmd {
     get => _setTextIfValidCmd;
     set => SetProperty(ref _setTextIfValidCmd, value);
   }
@@ -123,7 +123,7 @@ public class CommandExecution : NotifyPropertyChanged {
   public CommandExecution() {
     BrowseCmd = new Command(BrowseForFile, CanBrowseForFile);
     SetTextCmd = new Command<string>(SetText);
-    SetTextIfValidCmd = new Command<string, int>(SetText, CanSetText);
+    SetTextIfValidCmd = new Command<string>(SetText, CanSetText);
   }
 
   public void BrowseForFile() {
@@ -142,8 +142,12 @@ public class CommandExecution : NotifyPropertyChanged {
     Text = text;
   }
 
-  public bool CanSetText(int num) {
-    return num >= ValidNum;
+  public bool CanSetText(string num) {
+    if(!int.TryParse(num, out result)) {
+      return false;
+    }
+
+    return int.Parse(num) >= ValidNum;
   }
 
 }
@@ -151,9 +155,11 @@ public class CommandExecution : NotifyPropertyChanged {
 #### Version History
 1.2.1
 * Introduced typed Command objects.
+* Note:  Doubly typed Command objects are possible in this version but are likely to be problematic at best, and the singly typed Command object has a bug.  The work around for the bug is to use the doubly typed object specifying the same type twice.
 
-1.2.2-beta
+1.3.0-beta
 * Fixed error introduced in earlier which prevents the use of lambda expressions in RaisePropertyChanged not allowing lambdas in RaisePropertyChanged.
 * Improved handling in SetProperty methods which performs equality check between old and new values.
 * Added a new version of the SetPropertyMethod which takes a string value of the property name along with a params array of Command objects.
-* Removed NamAnkh.ico from installing as part of the NuGet package.
+* Removed NemAnkh.ico from installing as part of the NuGet package.
+* Removed doubly typed Command object.  This just was causing confusion since the vast majority of ICommandSource objects cannot take more than 1 parameter as a result there was a bug in the singly typed Command.  This is a breaking change for anyone who was making use of the double typed Command.

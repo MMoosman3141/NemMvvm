@@ -66,8 +66,6 @@ namespace UnitTestNemMvvm {
       }
     }
 
-
-
     [TestMethod]
     public void SetPropertyWithCommandObjectsAndActions() {
       bool propertyChanged = false;
@@ -171,76 +169,29 @@ namespace UnitTestNemMvvm {
         var2 = val;
         canRun2 = false;
         command2?.RaiseCanExecuteChanged();
-      }, () => {
+      }, val => {
         return canRun2;
       });
 
-      if(command1.CanExecute()) {
+      if(command1.CanExecute(5)) {
         command1.Execute(5);
       }
       Assert.IsTrue(var1 == 5);
 
-      if(command1.CanExecute()) {
+      if(command1.CanExecute(7)) {
         command1.Execute(7);
       }
       Assert.IsTrue(var1 == 7);
 
-      if(command2.CanExecute()) {
+      if(command2.CanExecute(5)) {
         command2.Execute(5);
       }
       Assert.IsTrue(var2 == 5);
 
-      if(command2.CanExecute()) {
+      if(command2.CanExecute(7)) {
         command2.Execute(7);
       }
       Assert.IsTrue(var2 == 5);
-    }
-
-    [TestMethod]
-    public void TestCommandsWithExecuteAndCanExecuteParameters() {
-      int var1 = 10;
-      int var2 = 10;
-      bool canRun2 = true;
-
-      Command<int, bool> command1 = null;
-      Command<int, bool> command2 = null;
-
-      //There's no good reason to specify a type for the canExecute and then not have a func there, but it is possible.
-      command1 = new Command<int, bool>(val => {
-        var1 = val;
-      });
-      command2 = new Command<int, bool>(val => {
-        var2 = val;
-        canRun2 = false;
-        command2?.RaiseCanExecuteChanged();
-      }, val => {
-        return val == canRun2;
-      });
-
-      if(command1.CanExecute(true)) { //A bool has to be specified even though there is no method to use it.
-        command1.Execute(5);
-      }
-      Assert.IsTrue(var1 == 5);
-
-      if(command1.CanExecute(true)) { //A bool has to be specified even though there is no method to use it.
-        command1.Execute(7);
-      }
-      Assert.IsTrue(var1 == 7);
-
-      if(command2.CanExecute(true)) {
-        command2.Execute(5);
-      }
-      Assert.IsTrue(var2 == 5);
-
-      if(command2.CanExecute(true)) {
-        command2.Execute(7);
-      }
-      Assert.IsTrue(var2 == 5);
-
-      if(command2.CanExecute(false)) {
-        command2.Execute(9);
-      }
-      Assert.IsTrue(var2 == 9);
     }
 
     [TestMethod]
@@ -255,34 +206,33 @@ namespace UnitTestNemMvvm {
     }
 
     [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
-    public void TestCommandCanExectureWithInvalidTypeParamter() {
-      int value = 10;
-      bool canRun = true;
+    public void TestTypedActionCommand() {
+      string testVal = "fail";
+      Command<string> testCommand = new Command<string>(val => {
+        testVal = val;
+      });
 
-      Command<int, bool> command = new Command<int, bool>(val => value = val, check => canRun);
+      CommandSourceForTest cmdSrc = new CommandSourceForTest(testCommand);
 
-#pragma warning disable CS0618
-      if(command.CanExecute("This is wrong")) {
-        command.Execute(5);
-      }
-#pragma warning restore CS0618
+      cmdSrc.Command.Execute("success");
 
+      Assert.AreEqual("success", testVal);
     }
 
     [TestMethod]
-    public void TestCommandImproperConstructors() {
-      try {
-        Command<string> command1 = new Command<string>(null);
-      } catch(ArgumentNullException) {
-        Assert.IsTrue(true);
-      }
+    public void TestTypedActionCommandWithCanExecute() {
+      string testVal = "fail";
+      Command<string> testCommand = new Command<string>(val => { testVal = val; }, val => { testVal = val; return true; });
 
-      try {
-        Command<string, string> command2 = new Command<string, string>(null, null);
-      } catch(ArgumentNullException) {
-        Assert.IsTrue(true);
-      }
+      CommandSourceForTest commandSrc = new CommandSourceForTest(testCommand, "success 2");
+
+      commandSrc.Command.Execute("success");
+
+      Assert.AreEqual("success", testVal);
+
+      testCommand.RaiseCanExecuteChanged(); //This call triggers the commandSrc to run the canExecute method
+
+      Assert.AreEqual("success 2", testVal);
     }
 
     private bool CanCommand1Run() {
