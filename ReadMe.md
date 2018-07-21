@@ -157,7 +157,7 @@ public class CommandExecution : NotifyPropertyChanged {
 * Introduced typed Command objects.
 * Note:  Doubly typed Command objects are possible in this version but are likely to be problematic at best, and the singly typed Command object has a bug.  The work around for the bug is to use the doubly typed object specifying the same type twice.
 
-1.3.0-beta
+1.3.0
 * Fixed error introduced in earlier which prevents the use of lambda expressions in RaisePropertyChanged not allowing lambdas in RaisePropertyChanged.
 * Improved handling in SetProperty methods which performs equality check between old and new values.
 * Added a new version of the SetPropertyMethod which takes a string value of the property name along with a params array of Command objects.
