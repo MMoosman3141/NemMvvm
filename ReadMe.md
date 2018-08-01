@@ -163,3 +163,6 @@ public class CommandExecution : NotifyPropertyChanged {
 * Added a new version of the SetPropertyMethod which takes a string value of the property name along with a params array of Command objects.
 * Removed NemAnkh.ico from installing as part of the NuGet package.
 * Removed doubly typed Command object.  This just was causing confusion since the vast majority of ICommandSource objects cannot take more than 1 parameter as a result there was a bug in the singly typed Command.  This is a breaking change for anyone who was making use of the double typed Command.
+
+1.3.1-beta
+* Converted to .NET Standard 2.0 library.
