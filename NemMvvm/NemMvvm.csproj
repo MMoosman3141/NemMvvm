@@ -17,7 +17,7 @@
     <RootNamespace>NemMvvm</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <FileVersion>1.3.2</FileVersion>
-    <PackageIcon>NemAnkh.ico</PackageIcon>
+    <PackageIcon>NemAnkh.png</PackageIcon>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
@@ -30,7 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="NemAnkh.ico">
+    <None Include="..\..\..\Pictures\NemAnkh.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
