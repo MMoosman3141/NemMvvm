@@ -53,6 +53,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="CommandSourceForTest.cs" />
+    <Compile Include="TestNotifyDataErrorInfo.cs" />
     <Compile Include="TestNotifyPropertyChanged.cs" />
     <Compile Include="TestCommands.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

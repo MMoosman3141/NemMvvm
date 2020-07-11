@@ -130,7 +130,9 @@ namespace UnitTestNemMvvm {
       };
 
       Property1 = "newValue";
+#pragma warning disable CS0618
       RaisePropertyChanged(() => Property1);
+#pragma warning restore
 
       Assert.IsTrue(propChanged);
     }

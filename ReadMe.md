@@ -6,7 +6,7 @@ There are 2 parts:
 
 ### NotifyProperyChanged
 
-NotifyPropertyChanged is a class inheriting from INotifyPropertyChanged. You can use it to avoid the need to create your own method for raising a notification message.
+NotifyPropertyChanged is a class inheriting from INotifyPropertyChanged and INotifyDataErrorInfo. You can use it to avoid the need to create your own method for raising a notification message or error raising.
 
 There are basically 2 methods available from this class:
 
@@ -76,6 +76,156 @@ public class Person : NotifyPropertyChanged {
   }
 }
 ```
+
+For error handling through the INotifyDataErrorInfo interface implementation we would simply add validator methods that are referenced in the SetProperty methods.  This will all for the HasErrors property and GetErrors methods to be properly handled.
+```csharp
+public class MainWindowVM : NotifyPropertyChanged {
+    private int _item1; //Must be odd
+    private string _item2; //Must be a number
+    private string _item3; //Must be a SSN
+    private string _item4; //Must be a phone number in the format (###) ###-####
+    private Command _runCmd;
+
+    public int Item1 {
+      get => _item1;
+      set => SetProperty(ref _item1, value, Item1Validator);
+    }
+    public string Item2 {
+      get => _item2;
+      set => SetProperty(ref _item2, value, Item2Validator);
+    }
+    public string Item3 {
+      get => _item3;
+      set => SetProperty(ref _item3, value, Item3Validator);
+    }
+    public string Item4 {
+      get => _item4;
+      set => SetProperty(ref _item4, value, Item4Validator);
+    }
+    public Command RunCmd {
+      get => _runCmd;
+      private set => SetProperty(ref _runCmd, value);
+    }
+
+    public MainWindowVM() {
+      RunCmd = new Command(RunAction, CanRun);
+
+      PropertyChanged += MainWindowVM_PropertyChanged;
+    }
+
+    private void MainWindowVM_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e) {
+      RunCmd.RaiseCanExecuteChanged();
+    }
+
+    private void RunAction() {
+      MessageBox.Show("Hey you hit the button.");
+    }
+
+    private bool CanRun() {
+      if (string.IsNullOrWhiteSpace(Item2)) {
+        return false;
+      }
+      if (string.IsNullOrWhiteSpace(Item3)) {
+        return false;
+      }
+      if (string.IsNullOrWhiteSpace(Item4)) {
+        return false;
+      }
+
+      return !HasErrors;
+    }
+
+    private ICollection Item1Validator(int arg) {
+      List<string> errors = new List<string>();
+
+      if(arg % 2 == 0) {
+        errors.Add("Item 1 must be an odd number.");
+      }
+
+      return errors;
+    }
+
+    private ICollection Item2Validator(string arg) {
+      List<string> errors = new List<string>();
+
+      if(!decimal.TryParse(arg, out decimal _)) {
+        errors.Add("Item 2 must be a number.");
+      }
+
+      return errors;
+    }
+
+    private ICollection Item3Validator(string arg) {
+      List<string> errors = new List<string>();
+
+      Regex validRgx = new Regex(@"[1-9]{3}-[1-9]{2}-[1-9]{4}");
+
+      if (!validRgx.IsMatch(arg)) {
+        errors.Add("Item 2 must be a social security number in the format ###-##-####");
+      }
+
+      return errors;
+    }
+
+    private ICollection Item4Validator(string arg) {
+      List<string> errors = new List<string>();
+
+      Regex validRgx = new Regex(@"\(\d{3}\) \d{3}-\d{4}");
+
+      if (!validRgx.IsMatch(arg)) {
+        errors.Add("Item 2 must be a telephone number in the format (###) ###-####");
+      }
+
+      return errors;
+    }
+  }
+```
+This kind code can then then be used to provide extra information for controls in WPF to display errors.
+```xaml
+<Window x:Class="Test_NemMvvm.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Test_NemMvvm"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+  <Window.Resources>
+    <local:MainWindowVM x:Key="vm" />
+
+    <Style TargetType="TextBox">
+      <Style.Triggers>
+        <Trigger Property="Validation.HasError" Value="True">
+          <Setter Property="ToolTip" Value="{Binding RelativeSource={RelativeSource Self}, Path=(Validation.Errors)/ErrorContent}" />
+          <Setter Property="BorderBrush" Value="Red" />
+        </Trigger>
+      </Style.Triggers>
+    </Style>
+  </Window.Resources>
+  <Grid DataContext="{StaticResource vm}">
+    <StackPanel>
+      <DockPanel>
+        <Label Content="Item 1"/>
+        <TextBox Text="{Binding Item1}" />
+      </DockPanel>
+      <DockPanel>
+        <Label Content="Item 2"/>
+        <TextBox Text="{Binding Item2}" />
+      </DockPanel>
+      <DockPanel>
+        <Label Content="Item 3"/>
+        <TextBox Text="{Binding Item3}" />
+      </DockPanel>
+      <DockPanel>
+        <Label Content="Item 4"/>
+        <TextBox Text="{Binding Item4}" />
+      </DockPanel>
+      <Button Content="Click Me!" Command="{Binding RunCmd}" />
+    </StackPanel>
+  </Grid>
+</Window>
+```
+
 ### Command object
 
 The Command object is a generic implementation of ICommand allowing you to specify an action to take, and a method to check if the action can be executed. It also allows you to specify Commands with the SetProperty handling described above to allow the Command to be checked if the property changes.
@@ -164,5 +314,8 @@ public class CommandExecution : NotifyPropertyChanged {
 * Removed NemAnkh.ico from installing as part of the NuGet package.
 * Removed doubly typed Command object.  This just was causing confusion since the vast majority of ICommandSource objects cannot take more than 1 parameter as a result there was a bug in the singly typed Command.  This is a breaking change for anyone who was making use of the double typed Command.
 
-1.3.1-beta
+1.3.1
 * Converted to .NET Standard 2.0 library.
+
+1.3.2
+* Added INotifyDataErrorInfo handling, allowing SetProperty methods to specify a validator function
