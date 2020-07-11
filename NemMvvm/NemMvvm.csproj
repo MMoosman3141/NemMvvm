@@ -4,21 +4,21 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <ApplicationIcon>NemAnkh.ico</ApplicationIcon>
     <PackageId>NemMvvm</PackageId>
-    <Version>1.3.1</Version>
+    <Version>1.3.2</Version>
     <Authors>Mark Moosman</Authors>
     <Company />
     <Product>NemMvvm</Product>
     <Description>A .NET Library to make working with Mvvm Patterns easier.</Description>
-    <Copyright>Copyright © 2018 Mark Moosman</Copyright>
-    <PackageLicenseUrl>http://www.apache.org/licenses/LICENSE-2.0.html</PackageLicenseUrl>
+    <Copyright>Copyright © 2020 Mark Moosman</Copyright>
     <PackageProjectUrl>https://github.com/MMoosman3141/NemMvvm</PackageProjectUrl>
-    <PackageIconUrl>https://github.com/MMoosman3141/NemMvvm/blob/master/NemMvvm/NemAnkh.ico?raw=true</PackageIconUrl>
     <AssemblyVersion>1.3.0</AssemblyVersion>
     <PackageTags>MVVM ICommand INotifyPropertyChanged</PackageTags>
     <PackageReleaseNotes>Version 1.3.1 - Converted to .NET Standard 2.0</PackageReleaseNotes>
     <RootNamespace>NemMvvm</RootNamespace>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <FileVersion>1.3.1</FileVersion>
+    <FileVersion>1.3.2</FileVersion>
+    <PackageIcon>NemAnkh.ico</PackageIcon>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -28,5 +28,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
     <DocumentationFile>bin\Release\netstandard2.0\NemMvvm.xml</DocumentationFile>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="NemAnkh.ico">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 
 </Project>
