@@ -1,13 +1,13 @@
 ﻿using System.Windows.Input;
 
-namespace NemMvvm {
+namespace NemMvvm; 
+
+/// <summary>
+/// Provides a common interface to expose the RaiseCanExecuteChanged method.
+/// </summary>
+public interface IFoundationCommand : ICommand {
   /// <summary>
-  /// Provides a common interface to expose the RaiseCanExecuteChanged method.
+  /// Raises the CanExecuteChanged event
   /// </summary>
-  public interface IFoundationCommand : ICommand {
-    /// <summary>
-    /// Raises the CanExecuteChanged event
-    /// </summary>
-    void RaiseCanExecuteChanged();
-  }
+  void RaiseCanExecuteChanged();
 }

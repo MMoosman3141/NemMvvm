@@ -1,10 +1,6 @@
-﻿using System;
-using System.Windows.Input;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using NemMvvm;
+using XUnitNemMvvm;
 
-namespace UnitTestNemMvvm {
-  [TestClass]
+namespace XUnitNemMvvm {
   public class TestCommands : NotifyPropertyChanged {
     private string _testValue1 = "oldValue";
     private string _testValue2 = "oldValue";
@@ -66,11 +62,11 @@ namespace UnitTestNemMvvm {
       }
     }
 
-    [TestMethod]
+    [Fact]
     public void SetPropertyWithCommandObjectsAndActions() {
       bool propertyChanged = false;
       this.PropertyChanged += (s, e) => {
-        if(e.PropertyName == nameof(TestValue4))
+        if (e.PropertyName == nameof(TestValue4))
           propertyChanged = true;
       };
 
@@ -94,25 +90,25 @@ namespace UnitTestNemMvvm {
         command2CanExecuteChanged = true;
       };
 
-      if(Command1.CanExecute())
+      if (Command1.CanExecute())
         Command1.Execute();
-      if(Command2.CanExecute())
+      if (Command2.CanExecute())
         Command2.Execute();
 
       _actionCondition = null;
 
       TestValue4 = "newValue";
 
-      Assert.AreEqual("newValue", TestValue4);
-      Assert.AreEqual("actionComplete", _testValue3);
-      Assert.IsTrue(propertyChanged);
-      Assert.IsTrue(_command1CanRun);
-      Assert.IsTrue(_command2CanRun);
-      Assert.IsTrue(command1CanExecuteChanged);
-      Assert.IsTrue(command2CanExecuteChanged);
+      Assert.Equal("newValue", TestValue4);
+      Assert.Equal("actionComplete", _testValue3);
+      Assert.True(propertyChanged);
+      Assert.True(_command1CanRun);
+      Assert.True(_command2CanRun);
+      Assert.True(command1CanExecuteChanged);
+      Assert.True(command2CanExecuteChanged);
     }
 
-    [TestMethod]
+    [Fact]
     public void TestCommandsNoParameters() {
       int var1 = 10;
       int var2 = 10;
@@ -132,28 +128,28 @@ namespace UnitTestNemMvvm {
         return canRun2;
       });
 
-      if(command1.CanExecute()) {
+      if (command1.CanExecute()) {
         command1.Execute();
       }
-      Assert.IsTrue(var1 == 11);
+      Assert.True(var1 == 11);
 
-      if(command1.CanExecute()) {
+      if (command1.CanExecute()) {
         command1.Execute();
       }
-      Assert.IsTrue(var1 == 12);
+      Assert.True(var1 == 12);
 
-      if(command2.CanExecute()) {
+      if (command2.CanExecute()) {
         command2.Execute();
       }
-      Assert.IsTrue(var2 == 11);
+      Assert.True(var2 == 11);
 
-      if(command2.CanExecute()) {
+      if (command2.CanExecute()) {
         command2.Execute();
       }
-      Assert.IsTrue(var2 == 11);
+      Assert.True(var2 == 11);
     }
 
-    [TestMethod]
+    [Fact]
     public void TestCommandsWithExecuteParameters() {
       int var1 = 10;
       int var2 = 10;
@@ -173,66 +169,66 @@ namespace UnitTestNemMvvm {
         return canRun2;
       });
 
-      if(command1.CanExecute(5)) {
+      if (command1.CanExecute(5)) {
         command1.Execute(5);
       }
-      Assert.IsTrue(var1 == 5);
+      Assert.True(var1 == 5);
 
-      if(command1.CanExecute(7)) {
+      if (command1.CanExecute(7)) {
         command1.Execute(7);
       }
-      Assert.IsTrue(var1 == 7);
+      Assert.True(var1 == 7);
 
-      if(command2.CanExecute(5)) {
+      if (command2.CanExecute(5)) {
         command2.Execute(5);
       }
-      Assert.IsTrue(var2 == 5);
+      Assert.True(var2 == 5);
 
-      if(command2.CanExecute(7)) {
+      if (command2.CanExecute(7)) {
         command2.Execute(7);
       }
-      Assert.IsTrue(var2 == 5);
+      Assert.True(var2 == 5);
     }
 
-    [TestMethod]
-    [ExpectedException(typeof(ArgumentException))]
+    [Fact]
     public void TestCommandExecuteWithInvalidTypeParameter() {
       int value = 10;
 
-      Command<int> command = new Command<int>(val => value = val);
+      Command<int> command = new(val => value = val);
 #pragma warning disable CS0618
-      command.Execute("This is something that should not work.");
+      Assert.Throws<ArgumentException>(() => command.Execute("This is something that should not work."));
 #pragma warning restore CS0618
     }
 
-    [TestMethod]
+    [Fact]
     public void TestTypedActionCommand() {
       string testVal = "fail";
-      Command<string> testCommand = new Command<string>(val => {
+      Command<string> testCommand = new(val => {
         testVal = val;
       });
 
-      CommandSourceForTest cmdSrc = new CommandSourceForTest(testCommand);
+      CommandSourceForTest cmdSrc = new(testCommand);
 
       cmdSrc.Command.Execute("success");
 
-      Assert.AreEqual("success", testVal);
+      Assert.Equal("success", testVal);
     }
 
-    [TestMethod]
+    [Fact]
     public void TestTypedActionCommandWithCanExecute() {
       string testVal = "fail";
-      Command<string> testCommand = new Command<string>(val => { testVal = val; }, val => { testVal = val; return true; });
+      Command<string> testCommand = new(val => { testVal = val; }, val => { testVal = val; return true; });
 
-      CommandSourceForTest commandSrc = new CommandSourceForTest(testCommand, "success 2");
+      CommandSourceForTest commandSrc = new(testCommand, "success 2");
+      
 
       commandSrc.Command.Execute("success");
 
-      Assert.AreEqual("success", testVal);
+      Assert.Equal("success", testVal);
 
       testCommand.RaiseCanExecuteChanged(); //This call triggers the commandSrc to run the canExecute method
 
-      Assert.AreEqual("success 2", testVal);
+      Assert.Equal("success 2", testVal);
     }
 
     private bool CanCommand1Run() {
