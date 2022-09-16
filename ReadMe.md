@@ -4,7 +4,7 @@ NemMvvm is a library designed to make coding of Mvvm patterns just a little easi
 
 There are 2 parts:
 
-### NotifyProperyChanged
+## NotifyProperyChanged
 
 NotifyPropertyChanged is a class inheriting from INotifyPropertyChanged and INotifyDataErrorInfo. You can use it to avoid the need to create your own method for raising a notification message or error raising.
 
@@ -77,31 +77,47 @@ public class Person : NotifyPropertyChanged {
 }
 ```
 
-For error handling through the INotifyDataErrorInfo interface implementation we would simply add validator methods that are referenced in the SetProperty methods.  This will all for the HasErrors property and GetErrors methods to be properly handled.
+For error handling through the INotifyDataErrorInfo interface implementation we would simply add validator methods that are referenced in the SetProperty methods.  To detect if errors occured, use the HasErrors property, and PropertyHasErrors and GetErrors methods.  If specifying an action as well, the action method is executed after the validator method.  This allows the action to make use of the validator results.
 ```csharp
 public class MainWindowVM : NotifyPropertyChanged {
     private int _item1; //Must be odd
     private string _item2; //Must be a number
     private string _item3; //Must be a SSN
     private string _item4; //Must be a phone number in the format (###) ###-####
+    private bool _hasProblemWithPhoneNumber;
     private Command _runCmd;
 
     public int Item1 {
       get => _item1;
       set => SetProperty(ref _item1, value, Item1Validator);
     }
+    
     public string Item2 {
       get => _item2;
       set => SetProperty(ref _item2, value, Item2Validator);
     }
+    
     public string Item3 {
       get => _item3;
       set => SetProperty(ref _item3, value, Item3Validator);
     }
+    
     public string Item4 {
       get => _item4;
-      set => SetProperty(ref _item4, value, Item4Validator);
+      set => SetProperty(ref _item4, value, Item4Validator, () => {
+        if(PropertyHasError()) {
+          HasProblemWithPhoneNumber = true;
+        } else {
+          HasProblemWithPhoneNumber = false;
+        }
+      });
     }
+
+    public bool HasProblemWithPhoneNumber {
+      get => _hasProblemWithPhoneNumber;
+      private set => SetProperty(ref _hasProblemWithPhoneNumber, value);
+    }
+
     public Command RunCmd {
       get => _runCmd;
       private set => SetProperty(ref _runCmd, value);
@@ -319,3 +335,7 @@ public class CommandExecution : NotifyPropertyChanged {
 
 1.3.2
 * Added INotifyDataErrorInfo handling, allowing SetProperty methods to specify a validator function
+
+1.3.3
+* For cases of the SetProperty method taking both a validator, and an action, the action is now called after the validator to allow using validator results within the action.
+* Added a PropertyHasErrors method to allow a check if a properties validator resulted in errors, without having to retrieve the list of errors.

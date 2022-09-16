@@ -28,6 +28,19 @@ namespace NemMvvm {
     }
 
     /// <summary>
+    /// Checks to see if a specific property when validated resulted in errors or not.
+    /// </summary>
+    /// <param name="propertyName">The name of the property being checked.  Defaults to the name of the property calling the method.</param>
+    /// <returns>True if there were errors associated with the property, false otherwise</returns>
+    protected bool PropertyHasErrors([CallerMemberName] string propertyName = "") {
+      if (string.IsNullOrWhiteSpace(propertyName)) {
+        throw new ArgumentNullException(nameof(propertyName), $"{nameof(propertyName)} cannot be empty or null");
+      }
+
+      return _validationErrors.ContainsKey(propertyName);
+    }
+
+    /// <summary>
     /// The lock object used by the SetProperty methods to ensure thread safety.
     /// This object is exposed to allow external code to be locked to ensure no problems with race conditions when adjusting a value which may also be adjusted via a SetProperty call.
     /// The use of this object is not recommended under normal circumstances.
@@ -37,9 +50,9 @@ namespace NemMvvm {
     /// <summary>
     /// Retrieves a collecton of errors for a specified property
     /// </summary>
-    /// <param name="propertyName">The property name to retieve error information for</param>
+    /// <param name="propertyName">The property name to retieve error information for.  This will default to the name of the method or property that is using it.</param>
     /// <returns>IEnumerable containing the errors for the specified property</returns>
-    public IEnumerable GetErrors(string propertyName) {
+    public IEnumerable GetErrors([CallerMemberName] string propertyName = "") {
       if (string.IsNullOrWhiteSpace(propertyName) || !_validationErrors.ContainsKey(propertyName)) {
         return null;
       }
@@ -159,7 +172,7 @@ namespace NemMvvm {
     /// <param name="field">A reference to the field which is to be affected.</param>
     /// <param name="value">The value to which the field is to be set.</param>
     /// <param name="validator">A function which checks the validity of the value.  If the value is invalid a collection of errors are returned and are then retrieved by the GetErrors method, as used by WPF.</param>
-    /// <param name="action">The action to run if the result of setting the field matches the runActionCheck parameter.</param>
+    /// <param name="action">The action to run if the result of setting the field matches the runActionCheck parameter.  The action will run after the validator, allowing validator results to be used by the action.</param>
     /// <param name="runActionCheck">A bool? value.  If true, and the field is successfully set the action will run.  If false and the field is not set the action will run.  If null (the default) the action will always run. </param>
     /// <param name="propertyName">The name of the property being set.  If not specified, the parameter defaults to the name of the calling property.</param>
     /// <returns>Returns true if the property changed values and was set.  Returns false otherwise.</returns>
@@ -173,10 +186,6 @@ namespace NemMvvm {
       lock (NotifyPropertyChangedLock) {
         propertyChanged = SetValue(ref field, value);
 
-        if (runActionCheck == null || propertyChanged == runActionCheck) {
-          action();
-        }
-
         if (propertyChanged) {
           ICollection errors = validator(value);
 
@@ -187,6 +196,10 @@ namespace NemMvvm {
           }
           RaiseErrorsChanged(propertyName);
           RaisePropertyChanged(propertyName);
+        }
+
+        if (runActionCheck == null || propertyChanged == runActionCheck) {
+          action();
         }
       }
       return propertyChanged;
@@ -356,7 +369,7 @@ namespace NemMvvm {
     /// Raises the PropertyChanged event for the property passed as a lambda expression.
     /// </summary>
     /// <param name="property">A property function passes as a lambda expression.</param>
-    [Obsolete("Use RaisePropertyChanged(nameof(property) instead")]
+    [Obsolete("Use RaisePropertyChanged(nameof(property) instead.  This method will be removed in a future version.")]
     protected void RaisePropertyChanged<T>(Expression<Func<T>> property) {
       if(property == null) {
         throw new ArgumentNullException(nameof(property), $"{nameof(property)} cannot be null");
@@ -371,8 +384,6 @@ namespace NemMvvm {
 
       RaisePropertyChanged(propertyName);
     }
-
-    
 
     /// <summary>
     /// Raises the ErrorsChanged event for the specified property.  If no parameter is passed, the name of the calling property is used.
