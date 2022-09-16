@@ -4,7 +4,7 @@ NemMvvm is a library designed to make coding of Mvvm patterns just a little easi
 
 There are 2 parts:
 
-### NotifyProperyChanged
+## NotifyProperyChanged
 
 NotifyPropertyChanged is a class inheriting from INotifyPropertyChanged and INotifyDataErrorInfo. You can use it to avoid the need to create your own method for raising a notification message or error raising.
 
@@ -226,7 +226,7 @@ This kind code can then then be used to provide extra information for controls i
 </Window>
 ```
 
-### Command object
+## Command object
 
 The Command object is a generic implementation of ICommand allowing you to specify an action to take, and a method to check if the action can be executed. It also allows you to specify Commands with the SetProperty handling described above to allow the Command to be checked if the property changes.
 
@@ -302,7 +302,7 @@ public class CommandExecution : NotifyPropertyChanged {
 
 }
 ```
-#### Version History
+## Version History
 1.2.1
 * Introduced typed Command objects.
 * Note:  Doubly typed Command objects are possible in this version but are likely to be problematic at best, and the singly typed Command object has a bug.  The work around for the bug is to use the doubly typed object specifying the same type twice.
@@ -319,3 +319,6 @@ public class CommandExecution : NotifyPropertyChanged {
 
 1.3.2
 * Added INotifyDataErrorInfo handling, allowing SetProperty methods to specify a validator function
+
+2.0.0
+* Converted to .NET 6.0

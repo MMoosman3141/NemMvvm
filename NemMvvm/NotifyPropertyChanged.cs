@@ -2,10 +2,9 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
-namespace NemMvvm; 
+namespace NemMvvm;
 
 /// <summary>
 /// This class provides functionality for INotifyPropertyChanged in order to allow easy binding of UI control properties to backend code.
@@ -21,11 +20,7 @@ public class NotifyPropertyChanged : INotifyPropertyChanged, INotifyDataErrorInf
   /// <summary>
   /// Indicates if validators have recorded errors
   /// </summary>
-  public bool HasErrors {
-    get {
-      return _validationErrors.Count > 0;
-    }
-  }
+  public bool HasErrors => _validationErrors.Count > 0;
 
   /// <summary>
   /// The lock object used by the SetProperty methods to ensure thread safety.
