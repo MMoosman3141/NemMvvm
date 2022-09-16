@@ -12,6 +12,7 @@ namespace UnitTestNemMvvm {
   public class TestNotifyDataErrorInfo : NotifyPropertyChanged {
     private string _intValue;
     private string _noDigitsValue;
+    private bool _noDigitsHasErrors;
 
     public string IntValue {
       get => _intValue;
@@ -19,7 +20,13 @@ namespace UnitTestNemMvvm {
     }
     public string NoDigitsValue {
       get => _noDigitsValue;
-      set => SetProperty(ref _noDigitsValue, value, NoDigitsValidator);
+      set => SetProperty(ref _noDigitsValue, value, NoDigitsValidator, () => { 
+        if(PropertyHasErrors()) {
+          _noDigitsHasErrors = true;
+        } else {
+          _noDigitsHasErrors = false;
+        }
+      });
     }
 
     private List<string> IsIntValidator(string value) {
@@ -58,10 +65,14 @@ namespace UnitTestNemMvvm {
     [TestMethod]
     public void TestNoDigitsValidator() {
       NoDigitsValue = "abcdef";
+      Assert.IsFalse(_noDigitsHasErrors);  //Testing action making use of validator results
+
       List<string> errors = (List<string>)GetErrors(nameof(NoDigitsValue));
       Assert.IsNull(errors);
 
       NoDigitsValue = "abc123def";
+      Assert.IsTrue(_noDigitsHasErrors);
+
       errors = (List<string>)GetErrors(nameof(NoDigitsValue));
       Assert.IsTrue(errors.Count > 0);
     }
